@@ -9,6 +9,7 @@ import io.weaviate.client6.v1.api.collections.Sharding;
 import io.weaviate.client6.v1.api.collections.Tokenization;
 import io.weaviate.client6.v1.api.collections.vectorindex.Distance;
 import io.weaviate.client6.v1.api.collections.VectorConfig;
+import io.weaviate.client6.v1.api.collections.Replication.AsyncReplicationConfig;
 import io.weaviate.client6.v1.api.collections.Replication.DeletionStrategy;
 import io.weaviate.client6.v1.api.collections.config.Shard;
 import io.weaviate.client6.v1.api.collections.config.ShardStatus;
@@ -381,14 +382,29 @@ class ManageCollectionsTest {
   void testAllReplicationSettings() throws IOException {
     // START AllReplicationSettings
     client.collections.create("Article",
-        col -> col.replication(Replication.of(rep -> rep.replicationFactor(1)
+        col -> col.replication(Replication.of(rep -> rep.replicationFactor(3)
             .asyncEnabled(true)
-            .deletionStrategy(DeletionStrategy.TIME_BASED_RESOLUTION))));
+            .deletionStrategy(DeletionStrategy.TIME_BASED_RESOLUTION)
+            .asyncReplication(AsyncReplicationConfig.of(async -> async
+                .replicationConcurrency(5)
+                .hashTreeHeight(16)
+                .replicationFrequencyMillis(30))))));
     // END AllReplicationSettings
 
     var config = client.collections.getConfig("Article").get();
-    assertThat(config.replication().replicationFactor()).isEqualTo(1);
+    assertThat(config.replication().replicationFactor()).isEqualTo(3);
     assertThat(config.replication().asyncEnabled()).isTrue();
+
+    // START UpdateReplicationSettings
+    var collection = client.collections.use("Article");
+
+    // highlight-start
+    collection.config.update(col -> col.replication(Replication.of(
+        rep -> rep.asyncReplication(AsyncReplicationConfig.of(async -> async
+            .replicationConcurrency(10)
+            .replicationFrequencyMillis(60))))));
+    // highlight-end
+    // END UpdateReplicationSettings
   }
 
   @Test
