@@ -99,7 +99,7 @@ On a write operation, the client's request will be sent to any node in the clust
 **Steps**
 1. The client sends data to any node, which will be assigned as the coordinator node
 2. The coordinator node sends the data to more than one replica node in the cluster
-3. The coordinator node waits for acknowledgment from a specified proportion (let's call it `x`) of cluster nodes. Starting with v1.18, `x` is [configurable](./consistency.md), and defaults to `ALL` nodes.
+3. The coordinator node waits for acknowledgment from a specified proportion (let's call it `x`) of cluster nodes. Starting with v1.18, `x` is [configurable](./consistency.md), and defaults to `QUORUM` nodes.
 4. When `x` ACKs are received by the coordinator node, the write is successful.
 
 As an example, consider a cluster size of 3 with replication factor of 3. So, all nodes in the distributed setup contain a copy of the data. When the client sends new data, this will be replicated to all three nodes.

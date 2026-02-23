@@ -705,13 +705,33 @@ await client.collections.create({
   name: 'Article',
   // highlight-start
   replication: configure.replication({
-    factor: 1,
+    factor: 3,
     asyncEnabled: true,
-    deletionStrategy: 'TimeBasedResolution'  // Available from Weaviate v1.28.0
+    deletionStrategy: 'TimeBasedResolution',
+    asyncConfig: {
+      maxWorkers: 5,
+      hashtreeHeight: 16,
+      frequency: 30,
+    },
   }),
   // highlight-end
 })
 // END AllReplicationSettings
+
+// START UpdateReplicationSettings
+const article = client.collections.use('Article')
+
+// highlight-start
+await article.config.update({
+  replication: reconfigure.replication({
+    asyncConfig: {
+      maxWorkers: 10,
+      frequency: 60,
+    },
+  }),
+})
+// highlight-end
+// END UpdateReplicationSettings
 
  // Test
  // TODO NEEDS TEST assert.equal(result.replicationConfig.factor, 3);

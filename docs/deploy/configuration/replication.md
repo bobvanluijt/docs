@@ -5,6 +5,7 @@ image: og/docs/configuration.jpg
 ---
 
 import SkipLink from '/src/components/SkipValidationLink'
+import AsyncReplicationPerCollectionConfig from '/_includes/async-replication-per-collection-config.mdx';
 
 Weaviate instances can be replicated. Replication can improve read throughput, improve availability, and enable zero-downtime upgrades.
 
@@ -59,9 +60,16 @@ import ReplicationConfigWithAsyncRepair from '/\_includes/code/configuration/rep
 The [environment variables](/deploy/configuration/env-vars/index.md#async-replication) for configuring async replication (`ASYNC_*`) have been introduced in `v1.29`.
 :::
 
+<AsyncReplicationPerCollectionConfig />
+
 Async replication helps achieve consistency for data replicated across multiple nodes.
 
 Update the following [environment variables](/deploy/configuration/env-vars/index.md#async-replication) to configure async replication for your particular use case.
+
+#### Worker limits
+
+- **Set the cluster-wide worker cap:** `ASYNC_REPLICATION_CLUSTER_MAX_WORKERS`
+  Set the maximum number of concurrent async replication workers across the entire cluster. Default: `30`. Individual collections can set their own `maxWorkers` via `asyncConfig`, but the total across all collections will not exceed this cluster limit.
 
 #### Logging
 
@@ -87,6 +95,8 @@ Once differences between nodes are detected, Weaviate propagates outdated or mis
 
 - **Set the frequency of propagation:** `ASYNC_REPLICATION_FREQUENCY_WHILE_PROPAGATING`
   After synchronization is completed on a node, temporarily adjust the data comparison frequency to the set value.
+- **Set pre-propagation timeout:** `ASYNC_REPLICATION_PRE_PROPAGATION_TIMEOUT`
+  Configure a delay before propagation begins to allow in-progress write operations to complete across nodes.
 - **Set propagation timeout:** `ASYNC_REPLICATION_PROPAGATION_TIMEOUT`
   Optionally configure a timeout for how long to wait during propagation when a node is unresponsive.
 - **Set propagation delay:** `ASYNC_REPLICATION_PROPAGATION_DELAY`
@@ -131,7 +141,7 @@ Beyond setting the initial replication factor, you can actively manage the place
 ## Related pages
 
 - [Concepts: Replication Architecture](/weaviate/concepts/replication-architecture/index.md)
-- [Configurinfg Async Replication](./async-rep.md)
+- [Configuring Async Replication](./async-rep.md)
 
 ## Questions and feedback
 

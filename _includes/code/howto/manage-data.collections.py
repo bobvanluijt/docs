@@ -818,12 +818,34 @@ client.collections.create(
     # highlight-start
     replication_config=Configure.replication(
         factor=3,
-        async_enabled=True,  # Enable asynchronous repair
-        deletion_strategy=ReplicationDeletionStrategy.TIME_BASED_RESOLUTION,  # Added in v1.28; Set the deletion conflict resolution strategy
+        async_enabled=True,
+        deletion_strategy=ReplicationDeletionStrategy.TIME_BASED_RESOLUTION,
+        async_config=Configure.Replication.async_config(
+            max_workers=5,
+            hashtree_height=16,
+            frequency=30,
+        ),
     ),
     # highlight-end
 )
 # END AllReplicationSettings
+
+# START UpdateReplicationSettings
+from weaviate.classes.config import Reconfigure
+
+collection = client.collections.get("Article")
+
+# highlight-start
+collection.config.update(
+    replication_config=Reconfigure.replication(
+        async_config=Reconfigure.Replication.async_config(
+            max_workers=10,
+            frequency=60,
+        ),
+    ),
+)
+# highlight-end
+# END UpdateReplicationSettings
 
 # Test
 collection = client.collections.use("Article")
