@@ -366,6 +366,7 @@ These metrics track Write-Ahead Log (WAL) recovery operations during startup.
 | `bucket_pause_durations_ms`       | Bucket pause durations                                    | `bucket_dir`                 | `Summary` |
 | `backup_restore_data_transferred` | Total number of bytes transferred during a backup restore | `backend_name`, `class_name` | `Counter` |
 | `backup_store_data_transferred`   | Total number of bytes transferred during a backup store   | `backend_name`, `class_name` | `Counter` |
+| `weaviate_restore_phase_duration_seconds` | Duration of restore phases (prepare, object_storage_download, schema_apply) | `phase` | `Histogram` |
 
 #### Shard management
 
