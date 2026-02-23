@@ -95,6 +95,8 @@ Once differences between nodes are detected, Weaviate propagates outdated or mis
 
 - **Set the frequency of propagation:** `ASYNC_REPLICATION_FREQUENCY_WHILE_PROPAGATING`
   After synchronization is completed on a node, temporarily adjust the data comparison frequency to the set value.
+- **Set pre-propagation timeout:** `ASYNC_REPLICATION_PRE_PROPAGATION_TIMEOUT`
+  Configure a delay before propagation begins to allow in-progress write operations to complete across nodes.
 - **Set propagation timeout:** `ASYNC_REPLICATION_PROPAGATION_TIMEOUT`
   Optionally configure a timeout for how long to wait during propagation when a node is unresponsive.
 - **Set propagation delay:** `ASYNC_REPLICATION_PROPAGATION_DELAY`
@@ -139,7 +141,7 @@ Beyond setting the initial replication factor, you can actively manage the place
 ## Related pages
 
 - [Concepts: Replication Architecture](/weaviate/concepts/replication-architecture/index.md)
-- [Configurinfg Async Replication](./async-rep.md)
+- [Configuring Async Replication](./async-rep.md)
 
 ## Questions and feedback
 

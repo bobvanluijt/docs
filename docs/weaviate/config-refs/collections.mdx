@@ -724,7 +724,7 @@ More details about the `vectorIndexType` and `vectorIndexConfig` parameters can 
 | :----------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------ | :-------------------------------------- |
 | `factor`           | Integer | The number of copies (replicas) to maintain for each shard. A factor of `3` means one primary and two replicas.                               | `1`                       | No in `v1.25+`, Yes in earlier versions |
 | `asyncEnabled`     | Boolean | Enable asynchronous replication. Added in `v1.26`                                                                                             | `false`                   | Yes                                     |
-| `deletionStrategy` | String  | Strategy for handling deletions in replication. Can be `NoAutomatedResolution`, `DeleteOnConflict` or `TimeBasedResolution`. Added in `v1.27` | `"NoAutomatedResolution"` | Yes                                     |
+| `deletionStrategy` | String  | Strategy for handling deletions in replication. Can be `NoAutomatedResolution`, `DeleteOnConflict` or `TimeBasedResolution`. Added in `v1.27` | `"TimeBasedResolution"` | Yes                                     |
 | `asyncConfig`      | Object  | Configuration for async replication tuning. See [`asyncConfig` parameters](#async-config) below. Added in `v1.36`                              | See below                 | Yes                                     |
 
 <details>
@@ -740,7 +740,7 @@ An example of a complete `replicationConfig` object:
   "replicationConfig": {
     "factor": 3,
     "asyncEnabled": true,
-    "deletionStrategy": "NoAutomatedResolution",
+    "deletionStrategy": "TimeBasedResolution",
     "asyncConfig": {
       "maxWorkers": 5,
       "hashtreeHeight": 16,

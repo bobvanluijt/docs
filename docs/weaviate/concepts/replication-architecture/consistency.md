@@ -293,7 +293,7 @@ Deletion resolution strategies are mutable. [Read more about how to update colle
 
 #### `NoAutomatedResolution`
 
-This is the default setting, and the only setting available in Weaviate versions prior to `v1.28`. In this mode, Weaviate does not treat deletion conflicts as a special case. If an object is present on some replicas but not others, Weaviate may potentially restore the object on the replicas where it is missing.
+This is the only setting available in Weaviate versions prior to `v1.28`. In this mode, Weaviate does not treat deletion conflicts as a special case. If an object is present on some replicas but not others, Weaviate may potentially restore the object on the replicas where it is missing.
 
 #### `DeleteOnConflict`
 
@@ -303,13 +303,13 @@ To do so, Weaviate updates an object as a deleted object on a replica upon recei
 
 #### `TimeBasedResolution`
 
-A deletion conflict in `timeBasedResolution` is resolved based on the timestamp of the deletion request, in comparison to any subsequent updates to the object such as a creation or an update.
+This is the default setting from `v1.36` onwards. A deletion conflict in `timeBasedResolution` is resolved based on the timestamp of the deletion request, in comparison to any subsequent updates to the object such as a creation or an update.
 
 If the deletion request has a timestamp that is later than the timestamp of any subsequent updates, the object is deleted on all replicas. If the deletion request has a timestamp that is earlier than the timestamp of any subsequent updates, the later updates are applied to all replicas.
 
 For example:
-- If an object is deleted at timestamp 100 and then recreated at timestamp 90, the recreation wins
-- If an object is deleted at timestamp 100 and then recreated at timestamp 110, the deletion wins
+- If an object is deleted at timestamp 100 and then recreated at timestamp 110, the recreation wins
+- If an object is deleted at timestamp 100 and then recreated at timestamp 90, the deletion wins
 
 #### Choosing a strategy
 

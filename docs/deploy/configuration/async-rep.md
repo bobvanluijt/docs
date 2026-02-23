@@ -80,7 +80,7 @@ Introduces a delay before considering an object for propagation. Only objects ol
 
 #### `ASYNC_REPLICATION_LOGGING_FREQUENCY`
 Controls how often the background async replication process logs its activity.
-  - By default it is set to 5 seconds. 
+  - By default it is set to 60 seconds.
   - **Use Case(s)**: Increasing the frequency provides more detailed logs, while decreasing it reduces log verbosity.
 </details>
 
@@ -147,7 +147,7 @@ Defines how often each node initiates the process of comparing its local data (v
 
 #### `ASYNC_REPLICATION_FREQUENCY_WHILE_PROPAGATING`
 Defines a shorter frequency for subsequent comparison and propagation attempts when a previous propagation cycle did not complete (i.e., not all detected differences were synchronized).
-  - By default it is set to 20 milliseconds. 
+  - By default it is set to 3 seconds (3000 milliseconds).
   -  **Use Case(s)**: When inconsistencies are known to exist, this expedites the synchronization process. 
   - **Considerations**: This is activated after a propagation cycle detects differences but does not propagate all of them due to limits. 
 
@@ -171,11 +171,17 @@ Defines the maximum time to wait for a response when requesting object metadata 
   - By default is set to 10 seconds. 
   - **Use Case(s)**: May need to be increased in environments with high network latency or potentially slow-responding nodes.
 
+#### `ASYNC_REPLICATION_PRE_PROPAGATION_TIMEOUT`
+Sets a delay before propagation begins to allow in-progress write operations to complete across nodes. This prevents propagation from starting before all nodes have finished processing recent writes.
+  - By default is set to 300 seconds (5 minutes).
+  - **Use Case(s)**: May need to be increased in environments with slow write operations or high write latency across nodes.
+  - **Considerations**: This timeout applies before the propagation phase begins. If writes typically take longer to replicate, increasing this value helps avoid premature propagation.
+
 #### `ASYNC_REPLICATION_PROPAGATION_TIMEOUT`
 Sets the maximum time allowed for a single propagation request (sending actual object data) to a remote node.
-  - By default is set to 30 seconds. 
+  - By default is set to 60 seconds.
   - **Use Case(s)**: May need to be increased in scenarios with high network latency, large object sizes (e.g., images, vectors), or when sending large batches of objects.
-  - **Considerations**: Network latency, batch size, and the size of the objects being propagated can all affect timeouts. 
+  - **Considerations**: Network latency, batch size, and the size of the objects being propagated can all affect timeouts.
 
 </details>
 
