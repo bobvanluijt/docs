@@ -153,6 +153,12 @@ Update async replication settings for an existing collection. The `asyncConfig` 
   </TabItem>
 </Tabs>
 
+:::info
+
+Changing the hash tree height invalidates the existing tree and triggers a full rebuild. The rebuild duration scales with the number of objects in the collection, but it runs in the background and does not block reads or writes.
+
+:::
+
 ## Sharding settings
 
 Configure sharding per collection.
