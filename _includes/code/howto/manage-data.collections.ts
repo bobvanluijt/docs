@@ -547,7 +547,7 @@ await client.collections.create({
       // highlight-end
     },
     {
-      name: 'chunk_no',
+      name: 'chunk_number',
       dataType: dataType.INT,
       // highlight-start
       indexRangeFilters: true,
@@ -567,8 +567,8 @@ await article.config.dropInvertedIndex('title', 'searchable')
 // Drop the filterable inverted index from the "title" property
 await article.config.dropInvertedIndex('title', 'filterable')
 
-// Drop the range filter index from the "chunk_no" property
-await article.config.dropInvertedIndex('chunk_no', 'rangeFilters')
+// Drop the range filter index from the "chunk_number" property
+await article.config.dropInvertedIndex('chunk_number', 'rangeFilters')
 // highlight-end
 // END DropInvertedIndex
 

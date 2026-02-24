@@ -2,7 +2,7 @@
 title: Time to live (TTL)
 sidebar_label: Time to live (TTL)
 image: og/docs/howto.jpg
-description: "Set object expiration with time-to-live (TTL) with code examples in Python, TypeScript, Go, Java, and C#."
+description: "Set object expiration with time-to-live (TTL) with code examples in Python, TypeScript, Java, and C#."
 ---
 
 import SkipLink from "/src/components/SkipValidationLink";
@@ -25,6 +25,12 @@ Expired objects are periodically removed from the collection by Weaviate's backg
 TTLs are currently defined at the collection level. They can be set [relative to an object's creation time](#relative-to-a-creation-time), [the last update time](#relative-to-a-last-update-time), or [a specific `DATE` property](#relative-to-a-specific-date-property) within the object.
 
 With all TTL definitions, you can optionally set whether to exclude expired, but not yet deleted, objects from query results. This can prevent erroneous data retrieval before the background deletion process runs.
+
+:::info Prerequisites
+TTL requires the [`OBJECTS_TTL_DELETE_SCHEDULE`](/docs/deploy/configuration/env-vars/index.md) environment variable to be set on the Weaviate instance. This variable defines the cron schedule for the background deletion process. If it is not set, expired objects will not be deleted.
+
+The minimum TTL value is 60 seconds.
+:::
 
 ## Relative to a creation time
 
@@ -146,7 +152,7 @@ Set a TTL to a relative value from a specific `DATE` property within the object.
 ## Further resources
 
 - [Concepts: Data | Time to live](../concepts/data.md#time-to-live-ttl)
-- [References: Environment variables](docs/deploy/configuration/env-vars/index.md)
+- [References: Environment variables](/docs/deploy/configuration/env-vars/index.md)
 
 ## Questions and feedback
 

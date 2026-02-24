@@ -114,9 +114,9 @@ You can customize both the `HNSW` and `Flat` configurations that the `Dynamic` i
 
 For more details, see the [Dynamic index configuration reference](../config-refs/indexing/vector-index.mdx#dynamic-index).
 
-## The HFresh Index: For High-Throughput Workloads
+## The HFresh Index: For Memory-Efficient Large Datasets
 
-The `HFresh` index is designed for high-throughput workloads where you need fast approximate nearest neighbor searches with low memory overhead. It uses a posting list structure where each vector is added to multiple posting lists, enabling efficient parallel search.
+The `HFresh` index is designed for large-scale datasets where you need fast approximate nearest neighbor searches with low memory overhead. It uses a posting list structure where each vector is added to multiple posting lists, enabling efficient parallel search.
 
 ### Default HFresh Configuration
 
@@ -125,7 +125,7 @@ To create a collection with the `HFresh` index using default settings, simply pa
 - `distance_metric`: `cosine`
 - `replicas`: `4` (number of posting lists per vector)
 - `search_probe`: `64` (number of posting lists to search)
-- `max_posting_size_kb`: computed dynamically
+- `max_posting_size_kb`: `48`
 
 <FilteredTextBlock
   text={PyCode}
@@ -138,7 +138,7 @@ To create a collection with the `HFresh` index using default settings, simply pa
 
 You can tune HFresh by adjusting its parameters:
 
-- `max_posting_size_kb`: The maximum allowed size for a posting list in KB. By default, this is computed dynamically.
+- `max_posting_size_kb`: The maximum allowed size for a posting list in KB. Default: `48`.
 - `replicas`: The number of posting lists in which a vector is stored. A higher value increases recall but uses more storage.
 - `search_probe`: The number of posting lists to search during a query. A higher value increases recall but slows down searches.
 

@@ -97,7 +97,7 @@ client.collections.create(
     vector_config=Configure.Vectors.text2vec_weaviate(
         vector_index_config=Configure.VectorIndex.dynamic()
     ),
-    multi_tenancy_config=Configure.multi_tenancy(enabled=True), # Dyanmic index works well with multi-tenancy set-ups
+    multi_tenancy_config=Configure.multi_tenancy(enabled=True), # Dynamic index works well with multi-tenancy set-ups
     # highlight-end
 )
 # END ConfigDynamic
@@ -123,7 +123,7 @@ client.collections.create(
             ),
         )
     ),
-    multi_tenancy_config=Configure.multi_tenancy(   # Dyanmic index works well with multi-tenancy set-ups
+    multi_tenancy_config=Configure.multi_tenancy(   # Dynamic index works well with multi-tenancy set-ups
         enabled=True,
         auto_tenant_creation=True,
         auto_tenant_activation=True,

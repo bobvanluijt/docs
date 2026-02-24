@@ -1,4 +1,4 @@
-This table lists the latest five Weaviate Database versions and corresponding client library versions.
+This table lists recent Weaviate Database versions and corresponding client library versions.
 
 | Weaviate Database <br/><small>([GitHub][cWeaviate])</small>         | First <br/>release date |                  Python <br/><small>([GitHub][cPython])</small>                   |   TypeScript/ <br/>JavaScript <br/><small>([GitHub][cTypeScript])</small>    |                   Go <br/><small>([GitHub][cGo])</small>                    |             Java <br/><small>([GitHub][cJava])</small>              |                   C# <br/><small>([GitHub][cCSharp])</small>                    |
 | :------------------------------------------------------------------ | :---------------------- | :-------------------------------------------------------------------------------: | :--------------------------------------------------------------------------: | :-------------------------------------------------------------------------: | :-----------------------------------------------------------------: | :-----------------------------------------------------------------------------: |
@@ -56,5 +56,6 @@ The [TypeScript client](https://github.com/weaviate/typescript-client) replaced 
 [cTypeScript]: https://github.com/weaviate/typescript-client/releases
 [cGo]: https://github.com/weaviate/weaviate-go-client/releases
 [cJava]: https://github.com/weaviate/java-client/releases
+[cCSharp]: https://github.com/weaviate/weaviate-dotnet-client/releases
 
 </details>

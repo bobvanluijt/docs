@@ -119,7 +119,7 @@ assert count == 0, f"Expected 0 objects after update time TTL, got {count}"
 client.collections.delete("CollectionWithTTL")
 
 # START TTLByDateProperty
-from weaviate.classes.config import Configure
+from weaviate.classes.config import Configure, Property, DataType
 import datetime
 
 client.collections.create(

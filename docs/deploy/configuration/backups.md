@@ -272,7 +272,7 @@ You can also use `X-Azure-Block-Size` and `X-Azure-Concurrency` as a client head
 
 ### Filesystem
 
-- Works with Google Cloud Storage
+- Works with the local filesystem and cloud providers
 - Supports single-node deployments only
 - Not recommended for production use
 

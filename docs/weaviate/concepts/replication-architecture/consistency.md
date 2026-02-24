@@ -328,7 +328,7 @@ If your read consistency is set to `All` or `Quorum`, the read coordinator will 
 | :- | :- |
 | Object never existed on some replicas. | Propagate the object to the missing replicas. |
 | Object is out of date. | Update the object on stale replicas. |
-| Object was deleted on some replicas. | Returns an error. Deletion may have failed, or the object may have been partially recreated. |
+| Object was deleted on some replicas. | Returns an error. Deletion may have failed, or the object may have been partially recreated. When using the `TimeBasedResolution` deletion strategy, the most recent version wins based on timestamps. |
 
 The read repair process also depends on the read and write consistency levels used.
 
