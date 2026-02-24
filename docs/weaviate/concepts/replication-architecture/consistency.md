@@ -220,7 +220,10 @@ The trade-offs can be summarized like this:
 Each tenant is backed by a shard. Therefore, when there is a high number of tenants, the memory consumption of async replication can be significant. (e.g. 1,000 tenants with a hash tree height of 16 will require an extra ~2 GB of memory per node, while a height of 20 will require ~34 GB per node).
 <br/>
 
-To reduce memory consumption, reduce the hash tree height. Keep in mind that this will result in slower hashing and potentially slower replication.
+As of `v1.36`, multi-tenant collections default to a hash tree height of `10` (~16KB per tenant per node), significantly reducing memory overhead compared to the single-tenant default of `16`.
+<br/>
+
+To further reduce memory consumption, reduce the hash tree height. Keep in mind that this will result in slower hashing and potentially slower replication.
 :::
 
 Use the following formulas and examples as a quick reference:
@@ -268,7 +271,9 @@ A larger hash tree means less data for each leaf to hash, leading to faster comp
   - `Number of Leaves = 2^20 = 1,048,576`
 
 :::note Default settings
-The default hash tree height of `16` is chosen to balance memory consumption with replication performance. Adjust this value based on your cluster node’s available resources and performance requirements.
+The default hash tree height is `16` for single-tenant collections and `10` for multi-tenant collections. These defaults balance memory consumption with replication performance. Similarly, the default `maxWorkers` is `3` for single-tenant collections and `30` for multi-tenant collections.
+
+As of `v1.36`, these parameters can be configured per-collection via the [`asyncConfig`](/weaviate/config-refs/collections#async-config) object in `replicationConfig`, overriding the cluster-wide environment variable defaults.
 :::
 
 ### Deletion resolution strategies
@@ -288,7 +293,7 @@ Deletion resolution strategies are mutable. [Read more about how to update colle
 
 #### `NoAutomatedResolution`
 
-This is the default setting, and the only setting available in Weaviate versions prior to `v1.28`. In this mode, Weaviate does not treat deletion conflicts as a special case. If an object is present on some replicas but not others, Weaviate may potentially restore the object on the replicas where it is missing.
+This is the only setting available in Weaviate versions prior to `v1.28`. In this mode, Weaviate does not treat deletion conflicts as a special case. If an object is present on some replicas but not others, Weaviate may potentially restore the object on the replicas where it is missing.
 
 #### `DeleteOnConflict`
 
@@ -298,13 +303,13 @@ To do so, Weaviate updates an object as a deleted object on a replica upon recei
 
 #### `TimeBasedResolution`
 
-A deletion conflict in `timeBasedResolution` is resolved based on the timestamp of the deletion request, in comparison to any subsequent updates to the object such as a creation or an update.
+This is the default setting from `v1.36` onwards. A deletion conflict in `timeBasedResolution` is resolved based on the timestamp of the deletion request, in comparison to any subsequent updates to the object such as a creation or an update.
 
 If the deletion request has a timestamp that is later than the timestamp of any subsequent updates, the object is deleted on all replicas. If the deletion request has a timestamp that is earlier than the timestamp of any subsequent updates, the later updates are applied to all replicas.
 
 For example:
-- If an object is deleted at timestamp 100 and then recreated at timestamp 90, the recreation wins
-- If an object is deleted at timestamp 100 and then recreated at timestamp 110, the deletion wins
+- If an object is deleted at timestamp 100 and then recreated at timestamp 110, the recreation wins
+- If an object is deleted at timestamp 100 and then recreated at timestamp 90, the deletion wins
 
 #### Choosing a strategy
 
@@ -323,7 +328,7 @@ If your read consistency is set to `All` or `Quorum`, the read coordinator will 
 | :- | :- |
 | Object never existed on some replicas. | Propagate the object to the missing replicas. |
 | Object is out of date. | Update the object on stale replicas. |
-| Object was deleted on some replicas. | Returns an error. Deletion may have failed, or the object may have been partially recreated. |
+| Object was deleted on some replicas. | Returns an error. Deletion may have failed, or the object may have been partially recreated. When using the `TimeBasedResolution` deletion strategy, the most recent version wins based on timestamps. |
 
 The read repair process also depends on the read and write consistency levels used.
 

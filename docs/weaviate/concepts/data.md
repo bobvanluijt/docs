@@ -282,9 +282,9 @@ The ability to add a named vector after collection creation is only available fo
 
 ### Time to live (TTL)
 
-:::caution Added in `v1.35.0` as a technical preview
-Time to live (TTL) was introduced in Weaviate `v1.35.0` as a technical preview feature, for local / self-hosted Weaviate instances. It is not available in Weaviate Cloud instances at this time.
-:::
+import TtlStatus from '/_includes/ttl-satus.mdx';
+
+<TtlStatus/>
 
 Objects can be optionally set to expire after a predetermined amount of time using the Time to Live (TTL) feature.
 

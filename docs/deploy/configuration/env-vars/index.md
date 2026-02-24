@@ -62,8 +62,11 @@ import APITable from '@site/src/components/APITable';
 | `MEMORY_READONLY_PERCENTAGE` | If memory usage is higher than the given percentage all shards on the affected node will be marked as `READONLY`, meaning all future write requests will fail. (Default: `0` - i.e. no limit) | `string - number` | `75` |
 | `MEMORY_WARNING_PERCENTAGE` | If memory usage is higher than the given percentage a warning will be logged by all shards on the affected node's disk. (Default: `0` - i.e. no limit) | `string - number` | `85` |
 | `MODULES_CLIENT_TIMEOUT` | Timeout for requests to Weaviate modules. Default: `50s` | `string - duration` | `5s`, `10m`, `1h` |
-| `OBJECTS_TTL_ALLOW_SECONDS` | If set, the `OBJECTS_TTL_DELETE_SCHEDULE` is to be a 6-field cron format including seconds. Default: `true` | `boolean` | `false` |
-| `OBJECTS_TTL_DELETE_SCHEDULE` | Schedule for deleting expired objects. Uses standard cron format, or a descriptor (e.g. `@hourly`). Default: `""` | `string - cron format` | `0 */6 * * *` (every 6 hours) |
+| `OBJECTS_TTL_BATCH_SIZE` | Number of objects deleted per batch during TTL cleanup. With the default pause settings, a pause occurs every `OBJECTS_TTL_BATCH_SIZE * OBJECTS_TTL_PAUSE_EVERY_NO_BATCHES` objects (100,000 by default). Can be modified at runtime. Default: `10000` <br/>Added in `v1.36` | `string - number` | `10000` |
+| `OBJECTS_TTL_CONCURRENCY_FACTOR` | Controls the concurrency of the TTL deletion process as a multiplier. Higher values use more resources but delete faster. Must be greater than 0. Can be modified at runtime. Default: `1` <br/>Added in `v1.36` | `string - number` | `1` |
+| `OBJECTS_TTL_DELETE_SCHEDULE` | Schedule for deleting expired objects. Accepts standard 5-field cron format, 6-field (with seconds), 7-field (with seconds and year), descriptors (`@yearly`, `@monthly`, `@weekly`, `@daily`, `@hourly`), or hash expressions. Default: `""` (disabled) <br/>Added in `v1.36` | `string - cron format` | `0 */6 * * *` (every 6 hours) |
+| `OBJECTS_TTL_PAUSE_DURATION` | How long to pause the TTL deletion process between batches. Longer pauses reduce resource pressure but slow down cleanup. If `0` there is no pause. Can be modified at runtime. Default: `1m` <br/>Added in `v1.36` | `string - duration` | `20s`, `2m` |
+| `OBJECTS_TTL_PAUSE_EVERY_NO_BATCHES` | Number of batch deletions to process before pausing. With the default batch size of 10,000, a pause occurs every 100,000 deleted objects. If `0` there is no pause. Can be modified at runtime. Default: `10` <br/>Added in `v1.36` | `string - number` | `3` |
 | `OPERATIONAL_MODE` | Sets the [mode of operation](../status.md#operational-modes) for the instance. Options: `READ_WRITE` (default), `READ_ONLY`, `WRITE_ONLY`, `SCALE_OUT`. Limits available operations based on the mode selected. | `string` | `READ_WRITE` |
 | `ORIGIN` | Set the http(s) origin for Weaviate | `string - HTTP origin` | `https://my-weaviate-deployment.com` |
 | `PERSISTENCE_DATA_PATH` | Path to the Weaviate data store.<br/>[Note about file systems and performance](/weaviate/concepts/resources.md#file-system). | `string - file path` | `/var/lib/weaviate` <br/> Starting in v1.24, defaults to `./data`|
@@ -241,16 +244,18 @@ To learn more about their usage, visit the **[replication how-to guide](/deploy/
 | Variable | Description | Type | Example Value |
 | --- | --- | --- | --- |
 | `ASYNC_REPLICATION_DISABLED` | Disable async replication. Default: `false` | `boolean` | `false` |
-| `ASYNC_REPLICATION_HASHTREE_HEIGHT` | Height of the hash tree used for data comparison between nodes. If the height is `0` each node will store just one digest per shard. Default: `16`, Min: `0`, Max: `20`<br/> [Read more about potentially increased memory consumption.](/weaviate/concepts/replication-architecture/consistency#memory-and-performance-considerations-for-async-replication) | `string - number` | `10` |
-| `ASYNC_REPLICATION_FREQUENCY` |  Frequency of periodic data comparison between nodes in seconds. Default: `30` | `string - number` | `60` |
-| `ASYNC_REPLICATION_FREQUENCY_WHILE_PROPAGATING` | Frequency of data comparison between nodes after a node has been synced in milliseconds. Default: `10` | `string - number` | `20` |
-| `ASYNC_REPLICATION_ALIVE_NODES_CHECKING_FREQUENCY` | Frequency of how often the background process checks for changes in the availability of nodes in seconds. Default: `5` | `string - number` | `20` |
-| `ASYNC_REPLICATION_LOGGING_FREQUENCY` | Frequency of how often the background process logs any events in seconds. Default: `5` | `string - number` | `7` |
+| `ASYNC_REPLICATION_CLUSTER_MAX_WORKERS` | Maximum concurrent async replication workers across the cluster. Default: `30` | `string - number` | `10` |
+| `ASYNC_REPLICATION_HASHTREE_HEIGHT` | Height of the hash tree used for data comparison between nodes. If the height is `0` each node will store just one digest per shard. Default: `16` (single-tenant) / `10` (multi-tenant), Min: `0`, Max: `20`<br/> [Read more about potentially increased memory consumption.](/weaviate/concepts/replication-architecture/consistency#memory-and-performance-considerations-for-async-replication) | `string - number` | `10` |
+| `ASYNC_REPLICATION_FREQUENCY` |  Frequency of periodic data comparison between nodes. Default: `30s` | `string - duration` | `60s` |
+| `ASYNC_REPLICATION_FREQUENCY_WHILE_PROPAGATING` | Frequency of data comparison between nodes while propagation is active. Default: `3s` | `string - duration` | `5s` |
+| `ASYNC_REPLICATION_ALIVE_NODES_CHECKING_FREQUENCY` | Frequency of how often the background process checks for changes in the availability of nodes. Default: `5s` | `string - duration` | `20s` |
+| `ASYNC_REPLICATION_LOGGING_FREQUENCY` | Frequency of how often the background process logs any events. Default: `60s` | `string - duration` | `7s` |
 | `ASYNC_REPLICATION_DIFF_BATCH_SIZE` | Specifies the batch size for comparing digest information between nodes. Default: `1000`, Min: `1`, Max: `10000` |`string - number`  | `2000` |
-| `ASYNC_REPLICATION_DIFF_PER_NODE_TIMEOUT` | Defines the time limit a node has to provide a comparison response in seconds. Default: `10` | `string - number` | `30` |
-| `ASYNC_REPLICATION_PROPAGATION_TIMEOUT` | Defines the time limit a node has to provide a propagation response in seconds. Default: `30` | `string - number` | `60` |
+| `ASYNC_REPLICATION_DIFF_PER_NODE_TIMEOUT` | Defines the time limit a node has to provide a comparison response. Default: `10s` | `string - duration` | `30s` |
+| `ASYNC_REPLICATION_PRE_PROPAGATION_TIMEOUT` | Sets a delay before propagation begins to allow in-progress write operations to complete across nodes. Default: `5m` | `string - duration` | `10m` |
+| `ASYNC_REPLICATION_PROPAGATION_TIMEOUT` | Defines the time limit a node has to provide a propagation response. Default: `1m` | `string - duration` | `2m` |
 | `ASYNC_REPLICATION_PROPAGATION_LIMIT` | Limits the number of out-of-sync objects that can be propagated in one asynchronous replication iteration. Default: `10000`, Min: `1`, Max: `1000000` | `string - number` | `5000` |
-| `ASYNC_REPLICATION_PROPAGATION_DELAY` | Sets a delay period to allow asynchronous write operations to reach all nodes in a shard/tenant before propagating new or updated objects. Default: `30` | `string - number` | `40` |
+| `ASYNC_REPLICATION_PROPAGATION_DELAY` | Sets a delay period to allow asynchronous write operations to reach all nodes in a shard/tenant before propagating new or updated objects. Default: `30s` | `string - duration` | `40s` |
 | `ASYNC_REPLICATION_PROPAGATION_CONCURRENCY` | Defines the number of workers which will concurrently propagate a batch of objects. Default: `5`, Min: `1`, Max: `20` | `string - number` | `10` |
 | `ASYNC_REPLICATION_PROPAGATION_BATCH_SIZE` | Sets the maximum number of objects to propagate in a single batch. Default: `100`, Min: `1`, Max: `1000` |`string - number`  | `200` |
 

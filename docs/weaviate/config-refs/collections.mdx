@@ -31,7 +31,7 @@ These are the top-level parameters you can set when creating a collection.
 | [`invertedIndexConfig`](#inverted-index)     | Object | Configuration for the inverted index, affecting filtering and keyword search.                                         | See [Inverted Index reference](./indexing/inverted-index.mdx#inverted-index-parameters)                                                                                                               | Yes           |
 | [`vectorConfig`](#vector-configuration)      | Object | Configure multiple named vectors each with their own `vectorizer`, `vectorIndexType`, and `vectorIndexConfig` fields. | `null`                                                                                                                                                                                                | Partially\*\* |
 | [`vectorizer`](#vector-configuration)        | String | The vectorizer module to use.                                                                                         | Default vectorizer defined by [environment variable](/deploy/configuration/env-vars#DEFAULT_VECTORIZER_MODULE). See [Model provider](../model-providers/index.md) for module-specific config defaults | No            |
-| [`vectorIndexType`](#vector-configuration)   | String | The type of vector index to use (`hnsw`, `flat`, `dynamic`).                                                          | `hnsw`                                                                                                                                                                                                | No            |
+| [`vectorIndexType`](#vector-configuration)   | String | The type of vector index to use (`hnsw`, `flat`, `dynamic`, `hfresh`).                                                | `hnsw`                                                                                                                                                                                                | No            |
 | [`moduleConfig`](#module-configuration)      | Object | Module-specific configuration settings.                                                                               | See [Module configuration](#module-configuration)                                                                                                                                                     | Partially     |
 | [`vectorIndexConfig`](#vector-configuration) | Object | Configuration settings specific to the chosen `vectorIndexType`.                                                      | See [Vector index reference](./indexing/vector-index.mdx)                                                                                                                                             | Partially     |
 | [`shardingConfig`](#sharding)                | Object | Controls sharding behavior in a multi-node cluster.                                                                   | See [Sharding section](#sharding)                                                                                                                                                                     | No            |
@@ -570,7 +570,7 @@ Using the `vectorConfig` parameter allows you to start with one vector per colle
 | Parameter                                                                | Type   | Description                                                                                                                                                   | Default                 | Mutable       |
 | :----------------------------------------------------------------------- | :----- | :------------------------------------------------------------------------------------------------------------------------------------------------------------ | :---------------------- | :------------ |
 | `vectorizer`                                                             | String | The vectorizer module to use (e.g., `text2vec-cohere`). Set to `none` to disable auto-vectorization. [Available model providers](../model-providers/index.md) | Module-specific default | No            |
-| [`vectorIndexType`](./indexing/vector-index.mdx)                         | String | Vector index type: `hnsw` (default), `flat`, or `dynamic`                                                                                                     | `hnsw`                  | No            |
+| [`vectorIndexType`](./indexing/vector-index.mdx)                         | String | Vector index type: `hnsw` (default), `flat`, `dynamic`, or `hfresh`                                                                                           | `hnsw`                  | No            |
 | [`vectorIndexConfig`](./indexing/vector-index.mdx)                       | Object | Configuration settings for your chosen `vectorIndexType`                                                                                                      | Index-specific defaults | Partially\*   |
 | `vectorConfig`                                                           | Object | **Alternative to above**: Define multiple named vector spaces                                                                                                 | `null`                  | Partially\*\* |
 | ↪ `vectorConfig.<name>.vectorizer`                                       | Object | Vectorizer config for this named vector (e.g., `{"text2vec-openai": {"properties": ["title"]}}`)                                                              | (Required)              | No            |
@@ -724,7 +724,8 @@ More details about the `vectorIndexType` and `vectorIndexConfig` parameters can 
 | :----------------- | :------ | :-------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------ | :-------------------------------------- |
 | `factor`           | Integer | The number of copies (replicas) to maintain for each shard. A factor of `3` means one primary and two replicas.                               | `1`                       | No in `v1.25+`, Yes in earlier versions |
 | `asyncEnabled`     | Boolean | Enable asynchronous replication. Added in `v1.26`                                                                                             | `false`                   | Yes                                     |
-| `deletionStrategy` | String  | Strategy for handling deletions in replication. Can be `NoAutomatedResolution`, `DeleteOnConflict` or `TimeBasedResolution`. Added in `v1.27` | `"NoAutomatedResolution"` | Yes                                     |
+| `deletionStrategy` | String  | Strategy for handling deletions in replication. Can be `NoAutomatedResolution`, `DeleteOnConflict` or `TimeBasedResolution`. Added in `v1.27` | `"TimeBasedResolution"` | Yes                                     |
+| `asyncConfig`      | Object  | Configuration for async replication tuning. See [`asyncConfig` parameters](#async-config) below. Added in `v1.36`                              | See below                 | Yes                                     |
 
 <details>
   <summary>Example replication configuration -  JSON object</summary>
@@ -738,14 +739,46 @@ An example of a complete `replicationConfig` object:
   // highlight-start
   "replicationConfig": {
     "factor": 3,
-    "asyncEnabled": false,
-    "deletionStrategy": "NoAutomatedResolution"
+    "asyncEnabled": true,
+    "deletionStrategy": "TimeBasedResolution",
+    "asyncConfig": {
+      "maxWorkers": 5,
+      "hashtreeHeight": 16,
+      "frequency": 30000
+    }
   }
   // highlight-end
 }
 ```
 
 </details>
+
+#### `asyncConfig` parameters {#async-config}
+
+:::info Added in `v1.36`
+These per-collection parameters override the corresponding [environment variables](/deploy/configuration/async-rep.md) at the collection level. If not set, the collection inherits the cluster-wide environment variable defaults.
+:::
+
+:::note Multi-tenant vs single-tenant defaults
+Some `asyncConfig` parameters have different defaults depending on whether the collection uses multi-tenancy. These differences are noted in the table below.
+:::
+
+| Parameter | Type | Description | Default (single-tenant) | Default (multi-tenant) |
+| :--- | :--- | :--- | :--- | :--- |
+| `maxWorkers` | Integer | Maximum number of concurrent async replication workers for this collection. | `3` | `30` |
+| `hashtreeHeight` | Integer | Height of the hash tree used for data comparison between nodes. Min: `0`, Max: `20` | `16` | `10` |
+| `frequency` | Integer | Frequency of periodic data comparison between nodes, in milliseconds. | `30000` | `30000` |
+| `frequencyWhilePropagating` | Integer | Frequency of data comparison while propagation is active, in milliseconds. | `3000` | `3000` |
+| `aliveNodesCheckingFrequency` | Integer | Frequency of checking node availability, in milliseconds. | `5000` | `5000` |
+| `loggingFrequency` | Integer | How often the async replication process logs its activity, in seconds. | `60` | `60` |
+| `diffBatchSize` | Integer | Number of object keys fetched per request during comparison. Min: `1`, Max: `10000` | `1000` | `1000` |
+| `diffPerNodeTimeout` | Integer | Timeout for a comparison response from a remote node, in seconds. | `10` | `10` |
+| `prePropagationTimeout` | Integer | Overall timeout for the pre-propagation phase, in seconds. | `300` | `300` |
+| `propagationTimeout` | Integer | Timeout for a propagation request to a remote node, in seconds. | `60` | `60` |
+| `propagationLimit` | Integer | Maximum number of objects propagated in a single iteration. Min: `1`, Max: `1000000` | `10000` | `10000` |
+| `propagationDelay` | Integer | Delay before considering an object for propagation, in milliseconds. | `30000` | `30000` |
+| `propagationConcurrency` | Integer | Number of concurrent workers for propagation. Min: `1`, Max: `20` | `5` | `5` |
+| `propagationBatchSize` | Integer | Maximum number of objects per propagation batch. Min: `1`, Max: `1000` | `100` | `100` |
 
 #### Code example - How to configure replication
 
