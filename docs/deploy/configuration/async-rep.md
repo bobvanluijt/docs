@@ -70,7 +70,7 @@ Defines the maximum number of objects that will be propagated in a single async 
 
 #### `ASYNC_REPLICATION_PROPAGATION_DELAY`
 Introduces a delay before considering an object for propagation. Only objects older than this delay are considered.
-  - By default it is set to 30 seconds.
+  - Its default value is `30s`. The value requires a time unit suffix (e.g. `30s`, `1m`).
   - **Use Case(s)**: If an object is inserted into one node but the insertion is still in progress, the hash comparison might detect it. This delay prevents the async replication from trying to propagate it before the local write operation is fully complete.
   - **Considerations**: This should be set based on the typical write latency of the system.
 </details>
@@ -80,7 +80,7 @@ Introduces a delay before considering an object for propagation. Only objects ol
 
 #### `ASYNC_REPLICATION_LOGGING_FREQUENCY`
 Controls how often the background async replication process logs its activity.
-  - By default it is set to 60 seconds.
+  - Its default value is `60s`. The value requires a time unit suffix (e.g. `30s`, `2m`).
   - **Use Case(s)**: Increasing the frequency provides more detailed logs, while decreasing it reduces log verbosity.
 </details>
 
@@ -138,17 +138,17 @@ Sets the maximum number of objects included in each batch when propagating data 
 <details>
 
 <summary> Synchronization Frequency </summary>
-#### `ASYNC_REPLICATION_FREQUENCY` 
-Defines how often each node initiates the process of comparing its local data (via the hash tree) with other nodes storing the same shard. This regularly checks for inconsistencies, even if no changes have been explicitly triggered. 
-- It's default value is 30 seconds. 
+#### `ASYNC_REPLICATION_FREQUENCY`
+Defines how often each node initiates the process of comparing its local data (via the hash tree) with other nodes storing the same shard. This regularly checks for inconsistencies, even if no changes have been explicitly triggered.
+- Its default value is `30s`. The value requires a time unit suffix (e.g. `30s`, `1m`).
 - **Use Case(s)**
   - Decreasing the frequency can be beneficial for applications that require faster convergence to eventual consistency. 
   - Increasing the frequency can be beneficial for reducing the load on the system by relaxing the eventual consistency. 
 
 #### `ASYNC_REPLICATION_FREQUENCY_WHILE_PROPAGATING`
 Defines a shorter frequency for subsequent comparison and propagation attempts when a previous propagation cycle did not complete (i.e., not all detected differences were synchronized).
-  - By default it is set to 3 seconds (3000 milliseconds).
-  -  **Use Case(s)**: When inconsistencies are known to exist, this expedites the synchronization process. 
+  - Its default value is `3s`. The value requires a time unit suffix (e.g. `3s`, `1m`).
+  -  **Use Case(s)**: When inconsistencies are known to exist, this expedites the synchronization process.
   - **Considerations**: This is activated after a propagation cycle detects differences but does not propagate all of them due to limits. 
 
 </details>
@@ -158,7 +158,7 @@ Defines a shorter frequency for subsequent comparison and propagation attempts w
 
 #### `ASYNC_REPLICATION_ALIVE_NODES_CHECKING_FREQUENCY`
 Defines the frequency at which the system checks for changes in the availability of nodes within the cluster.
-  - By default it is set to 5 seconds. 
+  - Its default value is `5s`. The value requires a time unit suffix (e.g. `5s`, `1m`).
   - **Use Case(s)**: When a node rejoins the cluster after a period of downtime, it is highly likely to be out of sync. This setting ensures that the replication process is initiated promptly.
 
 </details>
@@ -168,18 +168,18 @@ Defines the frequency at which the system checks for changes in the availability
 
 #### `ASYNC_REPLICATION_DIFF_PER_NODE_TIMEOUT`
 Defines the maximum time to wait for a response when requesting object metadata from a remote node during the comparison phase, this prevents indefinite blocking if a node is unresponsive.
-  - By default is set to 10 seconds. 
+  - Its default value is `10s`. The value requires a time unit suffix (e.g. `10s`, `1m`).
   - **Use Case(s)**: May need to be increased in environments with high network latency or potentially slow-responding nodes.
 
 #### `ASYNC_REPLICATION_PRE_PROPAGATION_TIMEOUT`
 Sets a delay before propagation begins to allow in-progress write operations to complete across nodes. This prevents propagation from starting before all nodes have finished processing recent writes.
-  - By default is set to 300 seconds (5 minutes).
+  - Its default value is `5m`. The value requires a time unit suffix (e.g. `5m`, `10m`).
   - **Use Case(s)**: May need to be increased in environments with slow write operations or high write latency across nodes.
   - **Considerations**: This timeout applies before the propagation phase begins. If writes typically take longer to replicate, increasing this value helps avoid premature propagation.
 
 #### `ASYNC_REPLICATION_PROPAGATION_TIMEOUT`
 Sets the maximum time allowed for a single propagation request (sending actual object data) to a remote node.
-  - By default is set to 60 seconds.
+  - Its default value is `1m`. The value requires a time unit suffix (e.g. `30s`, `2m`).
   - **Use Case(s)**: May need to be increased in scenarios with high network latency, large object sizes (e.g., images, vectors), or when sending large batches of objects.
   - **Considerations**: Network latency, batch size, and the size of the objects being propagated can all affect timeouts.
 
