@@ -53,6 +53,10 @@ If you encounter any issues along the way or have additional questions, use the 
 Before we get started, install [Docker](https://docs.docker.com/get-started/get-docker/) on your machine.
 We will be running Weaviate and Ollama language models locally. We recommend that you use a modern computer with at least 8GB of RAM, preferably 16GB or more.
 
+## Telemetry
+
+To help us improve Weaviate and understand community usage trends, Weaviate collects telemetry data by default. Te learn more or opt-out click [here](/deploy/configuration/telemetry).
+
 ---
 
 ## Start Weaviate and Ollama with Docker Compose
