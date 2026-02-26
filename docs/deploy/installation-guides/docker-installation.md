@@ -29,9 +29,9 @@ The command sets the following default [environment variables](#environment-vari
 - `AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED` defaults to `true`.
 - `QUERY_DEFAULTS_LIMIT` defaults to `10`.
 
-### Telemetry
+import TelemetryNotice from '/_includes/telemetry-notice.mdx';
 
-To help us improve Weaviate and understand community usage trends, Weaviate collects telemetry data by default. Te learn more or opt-out click [here](/deploy/configuration/telemetry).
+<TelemetryNotice/>
 
 ## Customize your Weaviate configuration
 
