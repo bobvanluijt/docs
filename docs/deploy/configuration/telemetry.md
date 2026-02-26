@@ -7,11 +7,11 @@ image: og/docs/configuration.jpg
 
 To help us improve Weaviate and understand community usage trends, Weaviate collects telemetry data by default. This includes basic information like your server version, operating system, and the number of objects in your instance.
 
-We do **not** collect any of your data objects, collections, class names, or any other information from your datasets than listed below.
+We do **not** collect your data objects, collection names, or any content from your datasets. Only the information listed below is collected.
 
 ## Data collected
 
-On startup, the Weaviate server generates a unique instance ID. Every 24 ours the instance sends this information:
+On startup, the Weaviate server generates a unique instance ID. Every 24 hours the instance sends this information:
 
 - Machine id
 - Payload type
@@ -23,7 +23,7 @@ On startup, the Weaviate server generates a unique instance ID. Every 24 ours th
 
 Weaviate does not collect any other telemetry information.
 
-## Disabling Telemetry Data
+## Disabling telemetry data
 
 To disable telemetry, add this line to your [system configuration](/deploy/configuration/env-vars/index.md) file:
 
@@ -31,17 +31,17 @@ To disable telemetry, add this line to your [system configuration](/deploy/confi
 DISABLE_TELEMETRY=true
 ```
 
-## Cloud Metadata
+## Cloud metadata
 
 Since Weaviate version `v1.33`, Weaviate will, when available, collect basic metadata from metadata endpoints it has access to on selected cloud providers (Google Cloud, Amazon Web Services, Azure).
 
-More information about the metadata endpoints: 
+More information about the metadata endpoints:
 
 * [AWS](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instancedata-data-retrieval.html)
 * [GCP](https://docs.cloud.google.com/compute/docs/metadata/overview)
-* [Azure](https://learn.microsoft.com/en-us/azure/virtual-machines/instance-metadata-service).
+* [Azure](https://learn.microsoft.com/en-us/azure/virtual-machines/instance-metadata-service)
 
-The Cloud Meta data contains:
+The cloud metadata contains:
 
 * AWS: [AWS Account ID](https://docs.aws.amazon.com/accounts/latest/reference/manage-acct-identifiers.html)
 * GCP: [Project ID](https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects)
